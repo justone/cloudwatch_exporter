@@ -141,6 +141,7 @@ public class CloudWatchCollector extends Collector {
 
     private List<List<Dimension>> getDimensions(MetricRule rule) {
       List<List<Dimension>> dimensions = new ArrayList<List<Dimension>>();
+      LOGGER.log(Level.WARNING, "rule dim: {0}", rule.awsDimensions);
       if (rule.awsDimensions == null) {
         dimensions.add(new ArrayList<Dimension>());
         return dimensions;
@@ -274,6 +275,7 @@ public class CloudWatchCollector extends Collector {
         Date startDate = new Date(start - 1000 * rule.delaySeconds);
         Date endDate = new Date(start - 1000 * (rule.delaySeconds + rule.rangeSeconds));
         GetMetricStatisticsRequest request = new GetMetricStatisticsRequest();
+        LOGGER.log(Level.WARNING, "ns: {0}", rule.awsNamespace);
         request.setNamespace(rule.awsNamespace);
         request.setMetricName(rule.awsMetricName);
         request.setStatistics(rule.awsStatistics);
@@ -294,7 +296,9 @@ public class CloudWatchCollector extends Collector {
         for (List<Dimension> dimensions: getDimensions(rule)) {
           request.setDimensions(dimensions);
 
+          LOGGER.log(Level.WARNING, "dim: {0}", dimensions);
           GetMetricStatisticsResult result = client.getMetricStatistics(request);
+          LOGGER.log(Level.WARNING, "res: {0}", result);
           cloudwatchRequests.inc();
           Datapoint dp = getNewestDatapoint(result.getDatapoints());
           if (dp == null) {
